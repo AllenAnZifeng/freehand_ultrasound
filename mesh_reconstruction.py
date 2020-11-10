@@ -1,3 +1,5 @@
+import copy
+
 import open3d as o3d
 import numpy as np
 from open3d.cpu.pybind.geometry import PointCloud
@@ -7,17 +9,34 @@ POINT_CLOUD_PATH = '3d_coordinate.xyz'
 
 if __name__ == '__main__':
     pcd = o3d.io.read_point_cloud(POINT_CLOUD_PATH)  # type:PointCloud
+
+    # estimate surface normals
     pcd.estimate_normals()
-    pcd.orient_normals_consistent_tangent_plane(100)
-    alpha = 0.3
-    radii = [0.005, 0.01, 0.02, 0.04]
+    # pcd.orient_normals_consistent_tangent_plane(100)
     o3d.visualization.draw_geometries([pcd], mesh_show_back_face=True, point_show_normal=True)
 
-    # tetra_mesh, pt_map = o3d.geometry.TetraMesh().create_from_point_cloud(pcd)
-    mesh,densities = o3d.geometry.TriangleMesh().create_from_point_cloud_poisson(pcd, 9)
+    # Enable one of following algorithms
+
+    # Use Ball pivoting
+    # radii = [1,2,3,4,5]
+    # mesh = o3d.geometry.TriangleMesh().create_from_point_cloud_ball_pivoting(
+    #     pcd, o3d.utility.DoubleVector(radii))
+
+    # Use Poisson surface reconstruction
+    depth = 10
+    mesh, densities = o3d.geometry.TriangleMesh().create_from_point_cloud_poisson(pcd, depth)
     vertices_to_remove = densities < np.quantile(densities, 0.01)
     mesh.remove_vertices_by_mask(vertices_to_remove)
+
     mesh.compute_vertex_normals()
     mesh.paint_uniform_color([0.5, 0.5, 0.5])
 
+    # Show result before scaling
     o3d.visualization.draw_geometries([mesh], mesh_show_back_face=True, point_show_normal=True)
+
+    # Transform and show result after scaling
+    z_scale = 6
+    T = np.eye(4)
+    T[2, 2] = z_scale
+    mesh_t = copy.deepcopy(mesh).transform(T)
+    o3d.visualization.draw_geometries([mesh_t], mesh_show_back_face=True)
