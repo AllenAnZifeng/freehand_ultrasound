@@ -63,6 +63,8 @@ def get_image_bright_locations(address, z_value) -> List[List[int]]:
         for c in range(col):
             if filtered_image[r][c] > 0:
                 res.append([r, c, z_value])
+
+
     avg_x,avg_y = calculate_image_center(res)
     offset_x,offset_y = base_center[0]-avg_x,base_center[1]-avg_y
     for i in range(len(res)):
@@ -121,6 +123,9 @@ def write_to_file(img_list):
                 file.write(str(img_list[img_num][pt_num][0]) + ' ' +str(img_list[img_num][pt_num][1]) + ' ' + str(img_list[img_num][pt_num][2]) + '\n')
 
 
+def testing_git():
+    print('learning git')
+
 if __name__ == '__main__':
 
     base_center = base_center_point()
@@ -138,3 +143,5 @@ if __name__ == '__main__':
     # plotting(img_list)
 
     pass
+
+
