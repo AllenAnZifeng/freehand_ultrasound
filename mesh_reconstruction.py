@@ -5,7 +5,7 @@ import numpy as np
 from open3d.cpu.pybind.geometry import PointCloud
 from open3d.cpu.pybind.utility import DoubleVector
 
-POINT_CLOUD_PATH = '3d_coordinate.xyz'
+POINT_CLOUD_PATH = '3d_coordinate_screwdriver.xyz'
 
 
 def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
@@ -18,11 +18,11 @@ def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float =
 
 if __name__ == '__main__':
     pcd = o3d.io.read_point_cloud(POINT_CLOUD_PATH)  # type:PointCloud
-
+    pcd = scale(pcd,0.077,0.077,0.28)
     # estimate surface normals
     pcd.estimate_normals()
-    # pcd.orient_normals_consistent_tangent_plane(100)
-    # o3d.visualization.draw_geometries([pcd], mesh_show_back_face=True, point_show_normal=True)
+    # pcd.orient_normals_consistent_tangent_plane(500)
+    o3d.visualization.draw_geometries([pcd], mesh_show_back_face=True, point_show_normal=True)
 
     # Enable one of following algorithms
 
@@ -32,8 +32,8 @@ if __name__ == '__main__':
     #     pcd, o3d.utility.DoubleVector(radii))
 
     # Use Poisson surface reconstruction
-    depth = 10
-    min_density_percentile = 0.05
+    depth = 9
+    min_density_percentile = 0.01
     mesh, densities = o3d.geometry.TriangleMesh().create_from_point_cloud_poisson(pcd, depth=depth)
     vertices_to_remove = densities < np.quantile(densities, min_density_percentile)
     mesh.remove_vertices_by_mask(vertices_to_remove)
@@ -44,6 +44,6 @@ if __name__ == '__main__':
     o3d.visualization.draw_geometries([mesh], mesh_show_back_face=True, point_show_normal=True)
 
     # Transform and show result after scaling
-    z_scale = 4
-    mesh_t = scale(mesh, scale_z=z_scale)
+    # z_scale = 4
+    # mesh_t = scale(mesh, scale_z=z_scale)
     # o3d.visualization.draw_geometries([mesh_t], mesh_show_back_face=True)
