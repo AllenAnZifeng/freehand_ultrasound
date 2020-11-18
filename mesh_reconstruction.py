@@ -5,7 +5,7 @@ import numpy as np
 from open3d.cpu.pybind.geometry import PointCloud
 from open3d.cpu.pybind.utility import DoubleVector
 
-POINT_CLOUD_PATH = '3d_coordinate_screwdriver.xyz'
+POINT_CLOUD_PATH = '3d_coordinate_not_aligned.xyz'
 
 
 def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
