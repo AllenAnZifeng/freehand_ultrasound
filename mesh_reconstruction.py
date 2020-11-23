@@ -5,7 +5,7 @@ import numpy as np
 from open3d.cpu.pybind.geometry import PointCloud
 from open3d.cpu.pybind.utility import DoubleVector
 
-POINT_CLOUD_PATH = '3d_coordinate_not_aligned.xyz'
+POINT_CLOUD_PATH = 'aligned_3d_coordinate.xyz'
 
 
 def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     pcd = scale(pcd,0.077,0.077,0.28)
     # estimate surface normals
     pcd.estimate_normals()
-    # pcd.orient_normals_consistent_tangent_plane(500)
+    # pcd.orient_normals_consistent_tangent_plane(100)
     o3d.visualization.draw_geometries([pcd], mesh_show_back_face=True, point_show_normal=True)
 
     # Enable one of following algorithms
@@ -33,17 +33,46 @@ if __name__ == '__main__':
 
     # Use Poisson surface reconstruction
     depth = 9
-    min_density_percentile = 0.01
+    min_density_percentile = 0.05
     mesh, densities = o3d.geometry.TriangleMesh().create_from_point_cloud_poisson(pcd, depth=depth)
     vertices_to_remove = densities < np.quantile(densities, min_density_percentile)
     mesh.remove_vertices_by_mask(vertices_to_remove)
 
-    # Show result before scaling
+    # Show result
     mesh.compute_vertex_normals()
     mesh.paint_uniform_color([0.5, 0.5, 0.5])
     o3d.visualization.draw_geometries([mesh], mesh_show_back_face=True, point_show_normal=True)
 
-    # Transform and show result after scaling
-    # z_scale = 4
-    # mesh_t = scale(mesh, scale_z=z_scale)
-    # o3d.visualization.draw_geometries([mesh_t], mesh_show_back_face=True)
+    # triangle_clusters, cluster_n_triangles, cluster_area = (
+    #     mesh.cluster_connected_triangles())
+    # triangle_clusters = np.asarray(triangle_clusters)
+    # cluster_n_triangles = np.asarray(cluster_n_triangles)
+    # cluster_area = np.asarray(cluster_area)
+    #
+    # print("Show largest cluster")
+    # mesh_1 = copy.deepcopy(mesh)
+    # largest_cluster_idx = cluster_n_triangles.argmax()
+    # triangles_to_remove = triangle_clusters != largest_cluster_idx
+    # mesh_1.remove_triangles_by_mask(triangles_to_remove)
+    # o3d.visualization.draw_geometries([mesh_1])
+
+
+    # # average filter
+    mesh_out = mesh.filter_smooth_simple(number_of_iterations=10)
+    mesh_out.compute_vertex_normals()
+    mesh.paint_uniform_color([0.5, 0.5, 0.5])
+    o3d.visualization.draw_geometries([mesh_out])
+
+    # # laplacian filter
+    # mesh_out = mesh.filter_smooth_laplacian(number_of_iterations=10)
+    # mesh_out.compute_vertex_normals()
+    # o3d.visualization.draw_geometries([mesh_out])
+
+    # # Taubin filter
+    # mesh_out = mesh.filter_smooth_taubin(number_of_iterations=100)
+    # mesh_out.compute_vertex_normals()
+    # o3d.visualization.draw_geometries([mesh_out])
+
+    # output stl,ply
+    # o3d.io.write_triangle_mesh("mesh.ply", mesh)
+
