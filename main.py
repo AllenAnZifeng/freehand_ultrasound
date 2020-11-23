@@ -1,3 +1,5 @@
+# fuck you
+
 import json
 
 import matplotlib.pyplot as plt
@@ -65,13 +67,13 @@ def get_image_bright_locations(address, z_value) -> List[List[int]]:
                 res.append([r, c, z_value])
 
 
-    avg_x,avg_y = calculate_image_center(res)
-    offset_x,offset_y = base_center[0]-avg_x,base_center[1]-avg_y
-    for i in range(len(res)):
-        res[i][0] +=offset_x
-        res[i][1] +=offset_y
+    # avg_x,avg_y = calculate_image_center(res)
+    # offset_x,offset_y = base_center[0]-avg_x,base_center[1]-avg_y
+    # for i in range(len(res)):
+    #     res[i][0] +=offset_x
+    #     res[i][1] +=offset_y
 
-    cv2.imwrite('00mytry.png',filtered_image)
+    # cv2.imwrite('00mytry.png',filtered_image)
     return res
 
 def get_image_bright_locations_base_image(address, z_value):
@@ -88,9 +90,9 @@ def get_image_bright_locations_base_image(address, z_value):
     return res
 
 def calculate_image_center(res):
-    print('res',res)
-    print(res[0])
-    print(res[0][0])
+    # print('res',res)
+    # print(res[0])
+    # print(res[0][0])
     x = [ point[0] for point in res]
     y = [ point[1] for point in res]
     avg_x=sum(x)/len(x)
@@ -101,6 +103,7 @@ def calculate_image_center(res):
 def get_all_bright_locations(count) -> List[List[List[int]]]:
     res = []
     for i in range(count):
+        print("frame%d.jpg" % i)
         res.append(get_image_bright_locations("frame%d.jpg" % i, i))
     return res
 
@@ -123,17 +126,14 @@ def write_to_file(img_list):
                 file.write(str(img_list[img_num][pt_num][0]) + ' ' +str(img_list[img_num][pt_num][1]) + ' ' + str(img_list[img_num][pt_num][2]) + '\n')
 
 
-def testing_git():
-    print('learning git')
 
 if __name__ == '__main__':
-
-    base_center = base_center_point()
+    # base_center = base_center_point()
     # print(base_center)
     # video_to_images()
-    # res = get_image_bright_locations('frame71.jpg',1)
+    # res = get_image_bright_locations('frame231.jpg',1)
     # print(res)
-
+    #
     img_list = get_all_bright_locations(91)
     write_to_file(img_list)
     # print(img_list)
@@ -141,7 +141,6 @@ if __name__ == '__main__':
     # scipy.io.savemat('00data.mat', mdict={'img_list': img_list})
 
     # plotting(img_list)
-
     pass
 
 
