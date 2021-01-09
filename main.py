@@ -3,9 +3,9 @@ from typing import List
 import numpy as np
 
 
-NUMBER_OF_PICTURES = 67
-STARTING_NUMBER = 50
-PICTURE_ADDRESS= "CTSproject/zly_left_png/zly_left_%d.png"
+NUMBER_OF_PICTURES = 50
+STARTING_NUMBER = 108
+PICTURE_ADDRESS= "data/azf_labelled/trial1/frame%d.jpg"
 
 def video_to_images(address):
     vidcap = cv2.VideoCapture(address) #'video.avi'
@@ -30,7 +30,7 @@ def get_image_bright_locations_filled(address, z_value) -> List[List[int]]:
     img= img[:, 80:col - 80]
     row, col = img.shape
     # 0 --> black, 255 --> white  color representation
-    ret, filtered_image = cv2.threshold(img, 250, 255, cv2.THRESH_BINARY)
+    ret, filtered_image = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY)
     # filtered_image 0 -->black
 
     contours = np.empty((1,2),np.int8)
@@ -56,7 +56,7 @@ def get_image_bright_locations(address, z_value) -> List[List[int]]:
     img = img[:, 80:col - 80]
     row, col = img.shape
     # 0 --> black, 255 --> white  color representation
-    ret, filtered_image = cv2.threshold(img, 250, 255, cv2.THRESH_BINARY)
+    ret, filtered_image = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
     # filtered_image 0 -->black
 
     for r in range(row):
@@ -64,7 +64,7 @@ def get_image_bright_locations(address, z_value) -> List[List[int]]:
             if filtered_image[r][c] > 0:
                 res.append([r, c, z_value])
 
-    # cv2.imwrite('00mytry.png',filtered_image)
+    cv2.imwrite('00mytry.png',filtered_image)
     return res
 
 def get_all_bright_locations() -> List[List[List[int]]]:
@@ -81,7 +81,7 @@ def write_to_file(img_list):
     y = []
     z = []
 
-    with open('3d_coordinate.xyz', 'w') as file:
+    with open('xyz_file/trial1_azf.xyz', 'w') as file:
         for img_num in range(len(img_list)):
             for pt_num in range(len(img_list[img_num])):
                 x.append([img_list[img_num][pt_num][0]])
@@ -92,7 +92,7 @@ def write_to_file(img_list):
 
 if __name__ == '__main__':
     # video_to_images()
-    # res = get_image_bright_locations('CTSproject/zly_left_png/zly_left_50.png',1)
+    # res = get_image_bright_locations('data/azf_labelled/trial1/frame118.jpg',1)
     # print(res)
     write_to_file(get_all_bright_locations())
 

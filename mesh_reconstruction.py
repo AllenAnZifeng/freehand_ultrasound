@@ -3,7 +3,7 @@ import open3d as o3d
 import numpy as np
 from open3d.cpu.pybind.geometry import PointCloud
 
-POINT_CLOUD_PATH = '3d_coordinate.xyz'
+POINT_CLOUD_PATH = 'xyz_file/trial1_azf.xyz'
 
 
 def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
@@ -42,6 +42,8 @@ if __name__ == '__main__':
     mesh.compute_vertex_normals()
     mesh.paint_uniform_color([0.5, 0.5, 0.5])
     o3d.visualization.draw_geometries([mesh], mesh_show_back_face=True, point_show_normal=True)
+
+    # print(np.asarray(mesh.vertices))
 
     # triangle_clusters, cluster_n_triangles, cluster_area = (
     #     mesh.cluster_connected_triangles())
