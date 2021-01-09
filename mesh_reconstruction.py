@@ -1,11 +1,9 @@
 import copy
-
 import open3d as o3d
 import numpy as np
 from open3d.cpu.pybind.geometry import PointCloud
-from open3d.cpu.pybind.utility import DoubleVector
 
-POINT_CLOUD_PATH = 'aligned_3d_coordinate.xyz'
+POINT_CLOUD_PATH = '3d_coordinate.xyz'
 
 
 def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
@@ -18,7 +16,9 @@ def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float =
 
 if __name__ == '__main__':
     pcd = o3d.io.read_point_cloud(POINT_CLOUD_PATH)  # type:PointCloud
-    pcd = scale(pcd,0.077,0.077,0.28)
+    pcd = scale(pcd,0.077,0.077,0.21)
+    # 37mm/480px = 0.077 mm/px
+    # 0.21 mm/px
     # estimate surface normals
     pcd.estimate_normals()
     # pcd.orient_normals_consistent_tangent_plane(100)
@@ -29,11 +29,11 @@ if __name__ == '__main__':
     # Use Ball pivoting
     # radii = [1,2,3,4,5]
     # mesh = o3d.geometry.TriangleMesh().create_from_point_cloud_ball_pivoting(
-    #     pcd, o3d.utility.DoubleVector(radii))
+    # pcd, o3d.utility.DoubleVector(radii))
 
     # Use Poisson surface reconstruction
     depth = 9
-    min_density_percentile = 0.05
+    min_density_percentile = 0.1
     mesh, densities = o3d.geometry.TriangleMesh().create_from_point_cloud_poisson(pcd, depth=depth)
     vertices_to_remove = densities < np.quantile(densities, min_density_percentile)
     mesh.remove_vertices_by_mask(vertices_to_remove)
@@ -58,10 +58,10 @@ if __name__ == '__main__':
 
 
     # # average filter
-    mesh_out = mesh.filter_smooth_simple(number_of_iterations=10)
-    mesh_out.compute_vertex_normals()
-    mesh.paint_uniform_color([0.5, 0.5, 0.5])
-    o3d.visualization.draw_geometries([mesh_out])
+    # mesh_out = mesh.filter_smooth_simple(number_of_iterations=10)
+    # mesh_out.compute_vertex_normals()
+    # mesh.paint_uniform_color([0.5, 0.5, 0.5])
+    # o3d.visualization.draw_geometries([mesh_out])
 
     # # laplacian filter
     # mesh_out = mesh.filter_smooth_laplacian(number_of_iterations=10)
