@@ -7,6 +7,7 @@
 @file: open3d_render.py
 @time: 2021/1/9 21:30
 '''
+import copy
 
 from open3d.cpu.pybind.geometry import TriangleMesh
 from open3d.cpu.pybind.utility import Vector3dVector,Vector3iVector
@@ -15,6 +16,12 @@ import numpy as np
 from typing import List
 import math
 
+def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
+    T = np.eye(4)
+    T[0, 0] = scale_x
+    T[1, 1] = scale_y
+    T[2, 2] = scale_z
+    return copy.deepcopy(geometry_obj).transform(T)
 
 def distance_squared(p1_id:int,p2_id:int)->int:
     return (point_cloud_array[p1_id][0]-point_cloud_array[p2_id][0])**2+(point_cloud_array[p1_id][1]-point_cloud_array[p2_id][1])**2+(point_cloud_array[p1_id][2]-point_cloud_array[p2_id][2])**2
@@ -81,5 +88,6 @@ if __name__ == '__main__':
     vertices = Vector3dVector(np.array(point_cloud_array))
     triangles = Vector3iVector(np.array(triangle_array))
     mesh = TriangleMesh(vertices,triangles)
+    mesh=scale(mesh, 0.077, 0.077, 0.21)
     mesh.paint_uniform_color([1, 0.706, 0])
     o3d.visualization.draw_geometries([mesh],mesh_show_back_face=True,point_show_normal=True,mesh_show_wireframe=True)
