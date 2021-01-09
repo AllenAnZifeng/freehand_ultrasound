@@ -57,15 +57,22 @@ if __name__ == '__main__':
 
     for layer_number in range(1,len(layered_point_array)):
         for point_id in layered_point_array[layer_number]:
-            points = [point_id]
-            points.extend(closest_next_frame_points(point_id,layer_number+1,2))
-            triangle_array.append(points)
 
-    for layer_number in range(len(layered_point_array),1):
+            fetched_points = closest_next_frame_points(point_id,layer_number+1,3)
+            tri1 = [point_id,fetched_points[0],fetched_points[1]]
+            tri2 = [point_id,fetched_points[1],fetched_points[2]]
+            triangle_array.append(tri1)
+            triangle_array.append(tri2)
+
+    for layer_number in range(len(layered_point_array),1,-1):
         for point_id in layered_point_array[layer_number]:
-            points = [point_id]
-            points.extend(closest_next_frame_points(point_id,layer_number-1,2))
-            triangle_array.append(points)
+            fetched_points = closest_next_frame_points(point_id,layer_number-1,3)
+
+            tri1 = [point_id, fetched_points[0], fetched_points[1]]
+            tri2 = [point_id, fetched_points[1], fetched_points[2]]
+
+            triangle_array.append(tri1)
+            triangle_array.append(tri2)
 
 
     # print(triangle_array)
