@@ -6,12 +6,14 @@ import numpy as np
 from open3d.cpu.pybind.geometry import TriangleMesh
 from open3d.cpu.pybind.utility import Vector3dVector, Vector3iVector
 
+
 def scale(geometry_obj, scale_x: float = 1, scale_y: float = 1, scale_z: float = 1):
     T = np.eye(4)
     T[0, 0] = scale_x
     T[1, 1] = scale_y
     T[2, 2] = scale_z
     return copy.deepcopy(geometry_obj).transform(T)
+
 
 class LayeredPoints:
     def __init__(self, points: List[Tuple[int, int, int]]):
@@ -61,6 +63,7 @@ def make_triangles(points: LayeredPoints, l1: int, l2: int) -> List[Tuple[int, i
 
     return triangles
 
+
 def make_triangles_overlap(points: LayeredPoints, l1: int, l2: int) -> List[Tuple[int, int, int]]:
     triangles = []
 
@@ -78,6 +81,7 @@ def make_triangles_overlap(points: LayeredPoints, l1: int, l2: int) -> List[Tupl
         triangles.append((p_i, p_dest_2, p_dest_3))
 
     return triangles
+
 
 if __name__ == '__main__':
     #     vertices_array = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0]])
@@ -111,7 +115,23 @@ if __name__ == '__main__':
     triangles = Vector3iVector(triangles_array)
 
     mesh = TriangleMesh(vertices, triangles)
-    mesh = scale(mesh,0.077,0.077,0.21)
-    mesh.paint_uniform_color([0.5, 0.5, 0.5])
+    mesh = scale(mesh, 0.077, 0.077, 0.21)
+    # mesh.paint_uniform_color([0.5, 0.5, 0.5])
+    # mesh.compute_vertex_normals()
+    # o3d.visualization.draw_geometries([mesh], mesh_show_back_face=True, point_show_normal=True, mesh_show_wireframe=True)
+
+    pcd = mesh.sample_points_poisson_disk(10000)
+    pcd.estimate_normals()
+    o3d.visualization.draw_geometries([pcd], mesh_show_back_face=True, point_show_normal=True)
+
+    o3d.io.write_point_cloud(POINT_CLOUD_PATH + '.xyzn', pcd)
+
+    # Use Ball pivoting
+    radii = [1]
+    mesh = o3d.geometry.TriangleMesh().create_from_point_cloud_ball_pivoting(
+    pcd, o3d.utility.DoubleVector(radii))
+
+    # Show result
     mesh.compute_vertex_normals()
+    mesh.paint_uniform_color([0.5, 0.5, 0.5])
     o3d.visualization.draw_geometries([mesh], mesh_show_back_face=True, point_show_normal=True)
